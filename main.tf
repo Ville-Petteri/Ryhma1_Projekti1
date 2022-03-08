@@ -163,40 +163,37 @@ resource "azurerm_linux_virtual_machine" "myvioterraformvm" {
 
   }
 }
-resource "azurerm_virtual_machine_extension" "vme" {
+#PostgreSQL Database within a PostgreSQL Server
+resource "azurerm_postgresql_server" "rg" {
+  name                = "vov-terraform-postgresql-server-1"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
 
+  sku_name = "B_Gen5_2"
 
+  storage_mb                   = 5120
+  backup_retention_days        = 7
+  geo_redundant_backup_enabled = false
+  auto_grow_enabled            = false
 
-  virtual_machine_id = azurerm_linux_virtual_machine.myvioterraformvm.id
+  administrator_login          = var.administrator_login
+  administrator_login_password = var.administrator_login_password
+  version                      = "9.5"
+  ssl_enforcement_enabled      = false
+}
 
-  name = "vme"
+resource "azurerm_postgresql_database" "rg" {
+  name                = "vov-terraform-db"
+  resource_group_name = azurerm_resource_group.rg.name
+  server_name         = azurerm_postgresql_server.rg.name
+  charset             = "UTF8"
+  collation           = "English_United States.1252"
+}
 
-  publisher = "Microsoft.Azure.Extensions"
-
-  type = "CustomScript"
-
-  type_handler_version = "2.0"
-
-  auto_upgrade_minor_version = true
-
-  settings = <<SETTINGS
-
- 
-
-    {
-
-
-
-    "commandToExecute": "sudo apt-get update && apt-get install -y apache2 && echo 'hello world yo yo yo ' > /var/www/html/index.html"
-
-
-
-    }
-
-
-
-    SETTINGS
-
-
-
+resource "azurerm_postgresql_firewall_rule" "rg" {
+  name                = "office"
+  resource_group_name = azurerm_resource_group.rg.name
+  server_name         = azurerm_postgresql_server.rg.name
+  start_ip_address    = "0.0.0.0"
+  end_ip_address      = "255.255.255.255"
 }
