@@ -1,3 +1,5 @@
+import datetime
+
 def vov_valikko():
     print('VOV-tuntikirjaus')
     print('1: Lisää tuntikirjaus')
@@ -21,18 +23,46 @@ def vov_valikko():
         return
 
 def lisaa_tuntikirjaus():
+    CurrentDate = datetime.date.today()
+    tanaanpaiva = str(CurrentDate.day) + "-" + str(CurrentDate.month) + "-" + str(CurrentDate.year)
+    aloituspvmaika=""
+    lopetuspvmaika=""
 
-    print("Syötä aloituspvm muodossa DD-MM-YYYY")
-    aloituspvm = input("aloituspvm: ")
-    
-    print("Syötä aloitusaika muodossa HH-MM")
-    aloitusaika = input("aloitusaika: ")
+    print('\nTänään on '+tanaanpaiva+"\n")
 
-    print("Syötä lopetuspvm muodossa DD-MM-YYYY")
-    lopetuspvm = input("lopetuspvm: ")
+    print("Tuntikirjaus")
     
-    print("Syötä lopetusaika muodossa HH-MM")
-    lopetusaika = input("lopetusaika: ")
+    while True:
+        try:
+            print("Syötä aloituspvm muodossa DD-MM-YYYY")
+            aloituspvm = input("aloituspvm: ")
+            
+            print("Syötä aloitusaika muodossa HH:MM")
+            aloitusaika = input("aloitusaika: ")
+
+            aloituspvmaika = muodosta_date_pvm(aloituspvm+" "+aloitusaika)
+            break
+        except:
+            print("------------------------------")
+            print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
+            print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH:MM")
+            print("------------------------------\n")
+
+    while True:
+        try:
+            print("Syötä lopetuspvm muodossa DD-MM-YYYY")
+            lopetuspvm = input("lopetuspvm: ")
+            
+            print("Syötä lopetusaika muodossa HH:MM")
+            lopetusaika = input("lopetusaika: ")
+
+            lopetuspvmaika = muodosta_date_pvm(aloituspvm+" "+aloitusaika)
+            break
+        except:
+            print("------------------------------")
+            print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
+            print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH:MM")
+            print("------------------------------\n")    
 
     print("Syötä projektinumero")
     projektitieto = int(input("Projekti: "))
@@ -41,6 +71,10 @@ def lisaa_tuntikirjaus():
     selite = input("Selite:")
 
     print(aloituspvm,aloitusaika,lopetusaika,lopetuspvm,projektitieto,selite)
+
+def muodosta_date_pvm(pvmaika):
+    date_muotoiltu_pvm = datetime.datetime.strptime(pvmaika,"%d-%m-%Y %H:%M")
+    return date_muotoiltu_pvm
 
 if __name__ == '__main__':
     vov_valikko()
