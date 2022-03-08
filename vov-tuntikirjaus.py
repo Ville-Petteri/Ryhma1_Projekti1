@@ -1,4 +1,5 @@
 import datetime
+import queries
 
 def vov_valikko():
     print('VOV-tuntikirjaus')
@@ -6,18 +7,15 @@ def vov_valikko():
     print('2: Näytä Projektit')
     print('3: Näytä kirjaukset')
     print('4: Muokkaa kirjausta')
-    print('5: Näytä projekti')
-    print('6: Lopeta')
+    print('5: Lopeta')
     valinta = int(input('Syötä valinta: '))
     if valinta == 1:
         lisaa_tuntikirjaus()
     elif valinta == 2:
-        return
+        queries.connect(valinta)
     elif valinta == 3:
-        return
+        queries.connect(valinta)
     elif valinta == 4:
-        return
-    elif valinta == 5:
         return
     elif valinta == 5:
         return
