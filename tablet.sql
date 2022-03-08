@@ -16,6 +16,7 @@ CREATE TABLE tuntikirjaukset (
     id              SERIAL PRIMARY KEY,
     aloitus         TIMESTAMP NOT NULL,
     lopetus         TIMESTAMP NOT NULL,
+    erotus          TIMESTAMPDIFF(SECOND, aloitus, lopetus),
     selite          varchar(255),
     projektit_id     INT,
     kayttajat_id     INT,
@@ -27,3 +28,4 @@ CREATE TABLE tuntikirjaukset (
             REFERENCES kayttajat(id)
 
     );
+

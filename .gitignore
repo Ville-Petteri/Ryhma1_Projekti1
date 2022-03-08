@@ -37,3 +37,4 @@ terraform.rc
 venv/
 .vscode/
 database.ini
+__pycache__/
