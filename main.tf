@@ -41,13 +41,15 @@ resource "azurerm_storage_container" "blob" {
   name                  = "blob"
   storage_account_name  = azurerm_storage_account.vovstorage.name
   container_access_type = "private"
-
-
 }
+
+
 resource "azurerm_network_security_group" "rg" {
   name                = "vov-security-group"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
+
+
   tags = {
     participants = "VOVteam"
   }
@@ -106,7 +108,9 @@ resource "azurerm_network_security_group" "vovterraformnsg" {
     destination_address_prefix = "*"
   }
 
-
+  tags = {
+    participants = "VOVteam"
+  }
 }
 # Create network interface
 resource "azurerm_network_interface" "vovterraformnicvio" {
@@ -121,6 +125,9 @@ resource "azurerm_network_interface" "vovterraformnicvio" {
     public_ip_address_id          = azurerm_public_ip.vovterraformpublicip.id
   }
 
+  tags = {
+    participants = "VOVteam"
+  }
 
 }
 # Connect the security group to the network interface
@@ -162,6 +169,9 @@ resource "azurerm_linux_virtual_machine" "myvioterraformvm" {
     storage_account_uri = azurerm_storage_account.vovstorage.primary_blob_endpoint
 
   }
+  tags = {
+    participants = "VOVteam"
+  }
 }
 #PostgreSQL Database within a PostgreSQL Server
 resource "azurerm_postgresql_server" "rg" {
@@ -180,6 +190,14 @@ resource "azurerm_postgresql_server" "rg" {
   administrator_login_password = var.administrator_login_password
   version                      = "9.5"
   ssl_enforcement_enabled      = false
+
+
+
+  tags = {
+    participants = "VOVteam"
+  }
+
+
 }
 
 resource "azurerm_postgresql_database" "rg" {
@@ -188,6 +206,7 @@ resource "azurerm_postgresql_database" "rg" {
   server_name         = azurerm_postgresql_server.rg.name
   charset             = "UTF8"
   collation           = "English_United States.1252"
+
 }
 
 resource "azurerm_postgresql_firewall_rule" "rg" {
@@ -196,4 +215,6 @@ resource "azurerm_postgresql_firewall_rule" "rg" {
   server_name         = azurerm_postgresql_server.rg.name
   start_ip_address    = "0.0.0.0"
   end_ip_address      = "255.255.255.255"
+
+
 }
