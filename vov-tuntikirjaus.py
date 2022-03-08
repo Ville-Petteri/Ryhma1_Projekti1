@@ -2,23 +2,39 @@ import datetime
 import queries
 
 def vov_valikko():
-    print('VOV-tuntikirjaus')
-    print('1: Lisää tuntikirjaus')
-    print('2: Näytä Projektit')
-    print('3: Näytä kirjaukset')
-    print('4: Muokkaa kirjausta')
-    print('5: Lopeta')
-    valinta = int(input('Syötä valinta: '))
-    if valinta == 1:
-        lisaa_tuntikirjaus()
-    elif valinta == 2:
-        queries.connect(valinta)
-    elif valinta == 3:
-        queries.connect(valinta)
-    elif valinta == 4:
-        return
-    elif valinta == 5:
-        return
+    while True:
+        print('******************************')
+        print('VOV-tuntikirjaus')
+        print('******************************')
+        print('1: Lisää tuntikirjaus')
+        print('2: Käyttäjät CRUD')
+        print('3: Projektit CRUD')
+        print('4: Kirjaukset CRUD')
+        print('5: Lopeta')
+        valinta = int(input('Syötä valinta: '))
+        if valinta == 1:
+            lisaa_tuntikirjaus()
+        elif valinta == 2 or valinta == 3 or valinta == 4:
+                valikko_crud(valinta)
+        elif valinta == 5:
+            break
+
+def valikko_crud(valinta):
+    muokattava=""
+    if(valinta == 2):
+        muokattava = "Käyttäjät"
+    elif(valinta == 3):
+        muokattava = "Projektit"
+    elif(valinta == 4):
+        muokattava = "Kirjaukset"
+    print('------------------------------')
+    print(muokattava +' CRUD')
+    print('------------------------------')    
+    print('1:Lisää uusi')
+    print('2:Listaa')
+    print('3:Muokkaa')
+    print('4:Deletoi\n')
+    valinta_crud = int(input('Syötä valinta: '))
 
 def lisaa_tuntikirjaus():
     CurrentDate = datetime.date.today()
