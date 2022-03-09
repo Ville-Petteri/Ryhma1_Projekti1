@@ -261,6 +261,10 @@ resource "azurerm_virtual_machine_scale_set" "rg" {
   }
 }
 
+
+
+
+
 #PostgreSQL Database within a PostgreSQL Server
 resource "azurerm_postgresql_server" "rg" {
   name                = "${var.prefix}-terraformpostrgesqlserver"
