@@ -15,9 +15,9 @@ def connect():
         luo_taulu_kayttajat(cursor)
         luo_taulu_projektit(cursor)
         luo_taulu_tuntikirjaukset(cursor)
-        #select_tuntikirjaukset(cursor)
-        #select_tuntisumma(cursor)
-        laheta_email(cursor)
+        select_tuntikirjaukset(cursor)
+        select_tuntisumma(cursor)
+        #laheta_email(cursor)
         con.commit()
         cursor.close()
     except (Exception, psycopg2.DatabaseError) as error:
@@ -51,8 +51,9 @@ def select_tuntikirjaukset(cursor):
         palautus=palautus+str(row)
         row = cursor.fetchone()
     return(palautus)
+
 def select_tuntisumma(cursor):
-    SQL ='SELECT AGE(lopetus, aloitus) AS  kesto FROM tuntikirjaukset;'
+    SQL ='SELECT SUM (lopetus - aloitus) AS total FROM tuntikirjaukset'
     cursor.execute(SQL)
     colnames= [desc[0] for desc in cursor.description]
     print(colnames)
@@ -81,6 +82,19 @@ def laheta_email(cursor):
 
     text = msg.as_string()
     server.sendmail(fromaddr, toaddr, text)
+
+def tuntikirjaukset_nimilla(cursor):
+    SQL = 'SELECT * FROM tuntikirjaukset WHERE C;'
+    cursor.execute(SQL)
+    colnames= [desc[0] for desc in cursor.description]
+    #print(colnames)
+    palautus=palautus+str(colnames)
+    row =cursor.fetchone()
+    while row is not None:
+        #print(row)
+        palautus=palautus+str(row)
+        row = cursor.fetchone()
+    return(palautus)
 
 
 

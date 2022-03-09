@@ -53,12 +53,26 @@ CREATE TABLE IF NOT EXISTS kayttajat (
     );
 
 
-CREATE TABLE IF NOT EXISTS kayttajat (
- projektit  (
+CREATE TABLE IF NOT EXISTS projektit  (
     id          SERIAL PRIMARY KEY,
     name        varchar(255) NOT NULL,
     selite       varchar(255)
     );      
    
+   
+INSERT INTO tuntikirjaukset2 (aloitus,lopetus,selite,projektit_id,kayttajat_id)
+    VALUES ('2022-3-9 12:0','2022-3-9 13:0', 'pulipulipulipuli', 2, 2);
+
+SELECT kayttajat.name,projektit.name,tuntikirjaukset.id FROM tuntikirjaukset, projektit,kayttajat 
+WHERE tuntikirjaukset.projektit_id=projektit.id AND tuntikirjaukset.kayttajat_id=kayttajat.id 
+
+SELECT id,aloitus,lopetus,lopetus - aloitus AS difference
+FROM tuntikirjaukset;
+
+SELECT SUM (lopetus - aloitus) AS total
+FROM tuntikirjaukset
+WHERE kayttajat_id=3;
+
+
 
 
