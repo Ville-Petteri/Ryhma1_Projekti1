@@ -1,6 +1,7 @@
 import psycopg2
 from config import config
 import datetime
+import vov_saa
 
 #connect funktio
 def connect(valinta):
@@ -43,7 +44,6 @@ def valitsija(valinta,cur):
         insert_tuntikirjaus(cur)
     elif valinta == 44 :
         delete_tuntikirjaus(cur)
-
 
 #kayttajien funktiot
 def select_kayttajat(cur):
@@ -266,10 +266,12 @@ def insert_tuntikirjaus(cur):
             print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
             print("Käyttäjää ei löytynyt")
             input("------------------------------\n") 
-            select_kayttajat(cur)            
+            select_kayttajat(cur)     
 
-    SQL = "INSERT INTO tuntikirjaukset (aloitus,lopetus,selite,projektit_id,kayttajat_id) VALUES (%s, %s, %s, %s, %s);"
-    data = (aloituspvmaika,lopetuspvmaika,selite,projektitieto,kayttajatieto)
+    saa_tieto = str(vov_saa.saa_helsinki())
+
+    SQL = "INSERT INTO tuntikirjaukset (aloitus,lopetus,selite,projektit_id,kayttajat_id,saa_tieto) VALUES (%s, %s, %s, %s, %s,%s);"
+    data = (aloituspvmaika,lopetuspvmaika,selite,projektitieto,kayttajatieto,saa_tieto)
     cur.execute(SQL, data)
     input('Tuntikirjaus lisätty')
 

@@ -14,8 +14,7 @@ def vov_valikko():
         valinta = int(input('Syötä valinta: '))
         if valinta == 1:
             queries.connect(valinta)
-            return
-        elif (2<= valinta <= 4):
+        elif 2<= valinta <= 4:
                 valikko_crud(valinta)
         elif valinta == 5:
             exit()
