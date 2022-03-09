@@ -216,7 +216,7 @@ def insert_tuntikirjaus(cur):
                 print("Syötä aloituspvm muodossa DD-MM-YYYY")
                 aloituspvm = input("aloituspvm: ")
                 
-                print("Syötä aloitusaika muodossa HH:MM")
+                print("Syötä aloitusaika muodossa HH-MM")
                 aloitusaika = input("aloitusaika: ")
 
                 aloituspvmaika = muodosta_date_pvm(aloituspvm+" "+aloitusaika)
@@ -224,7 +224,7 @@ def insert_tuntikirjaus(cur):
             except:
                 print("------------------------------")
                 print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
-                print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH:MM")
+                print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH-MM")
                 print("------------------------------\n")
 
         while True:
@@ -232,7 +232,7 @@ def insert_tuntikirjaus(cur):
                 print("Syötä lopetuspvm muodossa DD-MM-YYYY")
                 lopetuspvm = input("lopetuspvm: ")
                 
-                print("Syötä lopetusaika muodossa HH:MM")
+                print("Syötä lopetusaika muodossa HH-MM")
                 lopetusaika = input("lopetusaika: ")
 
                 lopetuspvmaika = muodosta_date_pvm(lopetuspvm+" "+lopetusaika)
@@ -240,10 +240,15 @@ def insert_tuntikirjaus(cur):
             except:
                 print("------------------------------")
                 print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
-                print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH:MM")
+                print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH-MM")
                 print("------------------------------\n")
         if aloituspvmaika < lopetuspvmaika:
             break
+        else:
+            print("------------------------------")
+            print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
+            print("Et voi syöttää lopetus aikaa, joka on aloituksen jälkeen")
+            input("------------------------------\n")
 
     while True:
         print("Syötä projektinumero")
@@ -281,7 +286,7 @@ def insert_tuntikirjaus(cur):
 
 #pvm funktio
 def muodosta_date_pvm(pvmaika):
-    date_muotoiltu_pvm = datetime.datetime.strptime(pvmaika,"%d-%m-%Y %H:%M")
+    date_muotoiltu_pvm = datetime.datetime.strptime(pvmaika,"%d-%m-%Y %H-%M")
     return date_muotoiltu_pvm
 
 if __name__ == '__main__':
