@@ -2,7 +2,7 @@ import psycopg2
 from config import config
 import datetime
 
-
+#connect funktio
 def connect(valinta):
     con = None
     try:
@@ -17,6 +17,7 @@ def connect(valinta):
         if con is not None:
             con.close()
 
+#Valinta funktio
 def valitsija(valinta,cur):
     if valinta == 1 :
         insert_tuntikirjaus(cur)
@@ -44,7 +45,7 @@ def valitsija(valinta,cur):
         delete_tuntikirjaus(cur)
 
 
-#kayttajien listaus
+#kayttajien funktiot
 def select_kayttajat(cur):
     SQL = 'SELECT * FROM kayttajat;'
     cur.execute(SQL)
@@ -94,7 +95,7 @@ def select_kayttajat_yksittainen(cur,id):
         row = cur.fetchone()
     print('******************************')
 
-#Projektien listaus
+#Projektien funktiot
 def select_projektit(cur):
     SQL = 'SELECT * FROM projektit;'
     cur.execute(SQL)
@@ -144,15 +145,28 @@ def select_projektit_yksittainen(cur,id):
         row = cur.fetchone()
     print('******************************')
 
-#id haku projekteista
+#id haku
 def select_projektit_id(cur):
+    idlista = []
     SQL = 'SELECT id FROM projektit;'
     cur.execute(SQL)
     row = cur.fetchone()
     while row is not None:
-        print(row)
+        idlista.append(row[0])
         row = cur.fetchone()
+    return(idlista)
 
+def select_kayttajat_id(cur):
+    idlista = []
+    SQL = 'SELECT id FROM kayttajat;'
+    cur.execute(SQL)
+    row = cur.fetchone()
+    while row is not None:
+        idlista.append(row[0])
+        row = cur.fetchone()
+    return(idlista)
+
+#tuntikirjaus funktiot
 def select_tuntikirjaukset(cur):
     SQL = 'SELECT * FROM tuntikirjaukset;'
     cur.execute(SQL)
@@ -188,6 +202,8 @@ def insert_tuntikirjaus(cur):
     tanaanpaiva = str(CurrentDate.day) + "-" + str(CurrentDate.month) + "-" + str(CurrentDate.year)
     aloituspvmaika=""
     lopetuspvmaika=""
+    projekti_idlista = select_projektit_id(cur)
+    kayttaja_idlista = select_kayttajat_id(cur)
 
     print('\nTänään on '+tanaanpaiva+"\n")
 
@@ -225,24 +241,42 @@ def insert_tuntikirjaus(cur):
             print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH:MM")
             print("------------------------------\n")    
 
-    print("Syötä projektinumero")
-    projektitieto = int(input("Projekti: "))
+    while True:
+        print("Syötä projektinumero")
+        projektitieto = int(input("Projekti: "))
+        if projektitieto in projekti_idlista:
+            break
+        else:
+            print("------------------------------")
+            print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
+            print("Projektia ei löytynyt")
+            input("------------------------------\n")
+            select_projektit(cur) 
 
     print("Lisää työselite")
     selite = input("Selite: ")
 
-    print("Lisää käyttäjä id")
-    kayttajat_id = input("id: ")
+    while True:
+        print("Lisää käyttäjä id")
+        kayttajatieto = int(input("id: "))
+        if kayttajatieto in kayttaja_idlista:
+            break
+        else:
+            print("------------------------------")
+            print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
+            print("Käyttäjää ei löytynyt")
+            input("------------------------------\n") 
+            select_kayttajat(cur)            
 
     SQL = "INSERT INTO tuntikirjaukset (aloitus,lopetus,selite,projektit_id,kayttajat_id) VALUES (%s, %s, %s, %s, %s);"
-    data = (aloituspvmaika,lopetuspvmaika,selite,projektitieto,kayttajat_id)
+    data = (aloituspvmaika,lopetuspvmaika,selite,projektitieto,kayttajatieto)
     cur.execute(SQL, data)
     input('Tuntikirjaus lisätty')
 
+#pvm funktio
 def muodosta_date_pvm(pvmaika):
     date_muotoiltu_pvm = datetime.datetime.strptime(pvmaika,"%d-%m-%Y %H:%M")
     return date_muotoiltu_pvm
 
-
 if __name__ == '__main__':
-    connect(4)
+    connect(99)
