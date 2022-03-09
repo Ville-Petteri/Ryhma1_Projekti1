@@ -178,7 +178,7 @@ resource "azurerm_linux_virtual_machine" "myvioterraformvm" {
     participants = var.team
   }
 } */
-//Scalesetti 
+//Scalesetti  
 resource "azurerm_virtual_network" "rg" {
   name                = "${var.prefix}-VNET"
   address_space       = ["10.0.0.0/16"]
