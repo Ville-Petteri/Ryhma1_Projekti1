@@ -5,23 +5,16 @@ variable "administrator_login_password" {}
 
 
 
-variable "linux_vm_image_publisher_debian_11" {
+variable "location" {
   type        = string
-  description = "Virtual machine source image publisher"
-  default     = "Debian"
+  description = "Location"
+  default     = "westeurope"
 }
-variable "linux_vm_image_offer_debian_11" {
+variable "team" {
   type        = string
-  description = "Virtual machine source image offer"
-  default     = "debian-11"
+  description = "team name for tags "
+  default     = "VOVteam"
 }
-variable "debian_11_sku" {
-  type        = string
-  description = "SKU for latest Debian 11"
-  default     = "11"
-}
-variable "debian_11_gen2_sku" {
-  type        = string
-  description = "SKU for latest Debian 11"
-  default     = "11-gen2"
+variable "prefix" {
+  default = "vov"
 }
