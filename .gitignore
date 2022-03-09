@@ -29,12 +29,13 @@ override.tf.json
 # Include tfplan files to ignore the plan output of command: terraform plan -out=tfplan
 # example: *tfplan*
 
-# Ignore CLI configuration files 
+.idea/
+
+
 .terraformrc
 terraform.rc
-
-.idea/
 venv/
 .vscode/
 database.ini
+frontend_connection.session.sql
 __pycache__/
