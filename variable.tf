@@ -5,8 +5,16 @@ variable "administrator_login_password" {}
 
 
 
-variable "linux_vm_image_publisher_debian_11" {
+variable "location" {
   type        = string
-  description = "Virtual machine source image publisher"
-  default     = "Debian"
+  description = "Location"
+  default     = "westeurope"
+}
+variable "team" {
+  type        = string
+  description = "team name for tags "
+  default     = "VOVteam"
+}
+variable "prefix" {
+  default = "vov"
 }
