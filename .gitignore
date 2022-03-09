@@ -33,9 +33,8 @@ override.tf.json
 
 .terraformrc
 terraform.rc
-.terraform\
-.terraform.lock.hcl
-*.trvars
-terraform.tfstate
-.terraform.tfstate.lock.info
-.terraform.tfstate.backup
+venv/
+.vscode/
+database.ini
+frontend_connection.session.sql
+__pycache__/
