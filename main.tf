@@ -21,7 +21,7 @@ resource "azurerm_resource_group" "rg" {
   location = "westeurope"
 
   tags = {
-    participants = "VOVteam"
+    team = "VOVteam"
   }
 
 
@@ -34,7 +34,7 @@ resource "azurerm_storage_account" "vovstorage" {
   account_replication_type = "LRS"
 
   tags = {
-    participants = "VOVteam"
+    team = "VOVteam"
   }
 }
 resource "azurerm_storage_container" "blob" {
@@ -44,14 +44,16 @@ resource "azurerm_storage_container" "blob" {
 }
 
 
-resource "azurerm_network_security_group" "rg" {
+///VM
+
+/* resource "azurerm_network_security_group" "rg" {
   name                = "vov-security-group"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
 
 
   tags = {
-    participants = "VOVteam"
+    team = "VOVteam"
   }
 }
 
@@ -63,7 +65,7 @@ resource "azurerm_virtual_network" "vovterraformnetwork" {
   resource_group_name = azurerm_resource_group.rg.name
 
   tags = {
-    participants = "VOVteam"
+    team = "VOVteam"
   }
 }
 # Create subnet
@@ -86,7 +88,7 @@ resource "azurerm_public_ip" "vovterraformpublicip" {
 
 
   tags = {
-    participants = "VOVteam"
+    team = "VOVteam"
   }
 
 }
@@ -113,8 +115,8 @@ resource "azurerm_network_security_group" "vovterraformnsg" {
   }
 }
 # Create network interface
-resource "azurerm_network_interface" "vovterraformnicvio" {
-  name                = "vovNIC"
+resource "azurerm_network_interface" "vovterraformnic" {
+  name                = "vovNIC1"
   location            = "westeurope"
   resource_group_name = azurerm_resource_group.rg.name
 
@@ -132,7 +134,7 @@ resource "azurerm_network_interface" "vovterraformnicvio" {
 }
 # Connect the security group to the network interface
 resource "azurerm_network_interface_security_group_association" "rg" {
-  network_interface_id      = azurerm_network_interface.vovterraformnicvio.id
+  network_interface_id      = azurerm_network_interface.vovterraformnic.id
   network_security_group_id = azurerm_network_security_group.vovterraformnsg.id
 }
 
@@ -143,7 +145,7 @@ resource "azurerm_linux_virtual_machine" "myvioterraformvm" {
   name                  = "viovm"
   location              = "westeurope"
   resource_group_name   = azurerm_resource_group.rg.name
-  network_interface_ids = [azurerm_network_interface.vovterraformnicvio.id]
+  network_interface_ids = [azurerm_network_interface.vovterraformnic.id]
   size                  = "Standard_D2_v2"
 
   os_disk {
@@ -172,7 +174,148 @@ resource "azurerm_linux_virtual_machine" "myvioterraformvm" {
   tags = {
     participants = "VOVteam"
   }
+} */
+//Scalesetti
+resource "azurerm_virtual_network" "rg" {
+  name                = "vovacctvn"
+  address_space       = ["10.0.0.0/16"]
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
 }
+
+resource "azurerm_subnet" "rg" {
+  name                 = "acctsub"
+  resource_group_name  = azurerm_resource_group.rg.name
+  virtual_network_name = azurerm_virtual_network.rg.name
+  address_prefixes     = ["10.0.2.0/24"]
+}
+
+resource "azurerm_public_ip" "rg" {
+  name                = "vovtest"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+  allocation_method   = "Static"
+  domain_name_label   = azurerm_resource_group.rg.name
+
+  tags = {
+    team = "vovteam"
+  }
+}
+
+resource "azurerm_lb" "rg" {
+  name                = "vovlb"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  frontend_ip_configuration {
+    name                 = "VovPublicIPAddress"
+    public_ip_address_id = azurerm_public_ip.rg.id
+  }
+}
+
+resource "azurerm_lb_backend_address_pool" "bpepool" {
+  resource_group_name = azurerm_resource_group.rg.name
+  loadbalancer_id     = azurerm_lb.rg.id
+  name                = "BackEndAddressPool"
+}
+
+resource "azurerm_lb_nat_pool" "lbnatpool" {
+  resource_group_name            = azurerm_resource_group.rg.name
+  name                           = "ssh"
+  loadbalancer_id                = azurerm_lb.rg.id
+  protocol                       = "Tcp"
+  frontend_port_start            = 50000
+  frontend_port_end              = 50119
+  backend_port                   = 22
+  frontend_ip_configuration_name = "VOVPublicIPAddress"
+}
+
+resource "azurerm_lb_probe" "rg" {
+  resource_group_name = azurerm_resource_group.rg.name
+  loadbalancer_id     = azurerm_lb.rg.id
+  name                = "http-probe"
+  protocol            = "Http"
+  request_path        = "/health"
+  port                = 8080
+}
+
+resource "azurerm_virtual_machine_scale_set" "rg" {
+  name                = "VOVtestscaleset-1"
+  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.rg.name
+
+  # automatic rolling upgrade
+  automatic_os_upgrade = true
+  upgrade_policy_mode  = "Rolling"
+
+  rolling_upgrade_policy {
+    max_batch_instance_percent              = 20
+    max_unhealthy_instance_percent          = 20
+    max_unhealthy_upgraded_instance_percent = 5
+    pause_time_between_batches              = "PT0S"
+  }
+
+  # required when using rolling upgrade policy
+  health_probe_id = azurerm_lb_probe.rg.id
+
+  sku {
+    name     = "Standard_F2"
+    tier     = "Standard"
+    capacity = 2
+  }
+
+  storage_profile_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04-LTS"
+    version   = "latest"
+  }
+
+  storage_profile_os_disk {
+    name              = ""
+    caching           = "ReadWrite"
+    create_option     = "FromImage"
+    managed_disk_type = "Standard_LRS"
+  }
+
+  storage_profile_data_disk {
+    lun           = 0
+    caching       = "ReadWrite"
+    create_option = "Empty"
+    disk_size_gb  = 10
+  }
+
+  os_profile {
+    computer_name_prefix = "vovtestvm"
+    admin_username       = var.administrator_login
+    admin_password       = var.administrator_login_password
+  }
+
+  os_profile_linux_config {
+    disable_password_authentication = false
+
+
+  }
+
+  network_profile {
+    name    = "terraformnetworkprofile"
+    primary = true
+
+    ip_configuration {
+      name                                   = "TestIPConfiguration"
+      primary                                = true
+      subnet_id                              = azurerm_subnet.rg.id
+      load_balancer_backend_address_pool_ids = [azurerm_lb_backend_address_pool.bpepool.id]
+      load_balancer_inbound_nat_rules_ids    = [azurerm_lb_nat_pool.lbnatpool.id]
+    }
+  }
+
+  tags = {
+    environment = "staging"
+  }
+}
+
+
 #PostgreSQL Database within a PostgreSQL Server
 resource "azurerm_postgresql_server" "rg" {
   name                = "vov-terraform-postgresql-server-1"
