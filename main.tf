@@ -11,9 +11,16 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    key_vault {
+      purge_soft_delete_on_destroy = true
+    }
+  }
   subscription_id = var.subscription_id
   tenant_id       = var.tenant_id
+
+
+
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -24,6 +31,51 @@ resource "azurerm_resource_group" "rg" {
     team = var.team
   }
 }
+
+# Connect the security group to the network interface
+resource "azurerm_network_interface_security_group_association" "rg" {
+  network_interface_id      = azurerm_network_interface.vovterraformnic.id
+  network_security_group_id = azurerm_network_security_group.vovterraformnsg.id
+}
+
+
+
+# Create virtual machine
+resource "azurerm_linux_virtual_machine" "myvioterraformvm" {
+  name                  = "${var.prefix}-vm"
+  location              = var.location
+  resource_group_name   = azurerm_resource_group.rg.name
+  network_interface_ids = [azurerm_network_interface.vovterraformnic.id]
+  size                  = "Standard_D2_v2"
+
+  os_disk {
+    name                 = "myOsDisk"
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "Canonical"
+    offer     = "UbuntuServer"
+    sku       = "16.04-LTS"
+    version   = "latest"
+  }
+
+  computer_name                   = "${var.prefix}-vm"
+  admin_username                  = "azureuser"
+  admin_password                  = "TosiSalainen1!"
+  disable_password_authentication = false
+
+
+  boot_diagnostics {
+    storage_account_uri = azurerm_storage_account.vovstorage.primary_blob_endpoint
+
+  }
+  tags = {
+    participants = var.team
+  }
+} */
+//Scalesetti  
 resource "azurerm_virtual_network" "rg" {
   name                = "${var.prefix}-VNET"
   address_space       = ["10.0.0.0/16"]
@@ -111,7 +163,38 @@ resource "azurerm_virtual_machine_scale_set" "rg" {
   }
 }
 
+#keyvault
 
+data "azurerm_client_config" "current" {}
+
+resource "azurerm_key_vault" "rg" {
+  name                        = "${var.prefix}keyvault"
+  location                    = azurerm_resource_group.rg.location
+  resource_group_name         = azurerm_resource_group.rg.name
+  enabled_for_disk_encryption = true
+  tenant_id                   = data.azurerm_client_config.current.tenant_id
+  soft_delete_retention_days  = 7
+  purge_protection_enabled    = false
+
+  sku_name = "standard"
+
+  access_policy {
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.object_id
+
+    key_permissions = [
+      "Get",
+    ]
+
+    secret_permissions = [
+      "Get",
+    ]
+
+    storage_permissions = [
+      "Get",
+    ]
+  }
+}
 
 
 
