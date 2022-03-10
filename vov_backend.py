@@ -20,6 +20,7 @@ def connect():
         luo_taulu_tuntikirjaukset(cursor)
         #select_tuntisumma(cursor)
         #tuntikirjaukset_nimilla(cursor)
+        #tuntikirjaukset_table(cursor)
         laheta_email(cursor)
         con.commit()
         cursor.close()
@@ -52,8 +53,7 @@ def select_tuntisumma(cursor):
 #Funktio hakee ja palauttaa kirjaajan nimen,projektin nimen,aloitusjan ja keston sekä selitteen jokaisesta tuntikirjauksesta
 def tuntikirjaukset_nimilla(cursor):
     palautus=""
-    testi=""
-    SQL = 'SELECT kayttajat.name,projektit.name,tuntikirjaukset.aloitus,tuntikirjaukset.lopetus - tuntikirjaukset.aloitus AS difference,tuntikirjaukset.selite FROM tuntikirjaukset, projektit,kayttajat WHERE tuntikirjaukset.projektit_id=projektit.id AND tuntikirjaukset.kayttajat_id=kayttajat.id;'
+    SQL = 'SELECT kayttajat.name AS Käyttäjä,projektit.name AS Projekti,tuntikirjaukset.aloitus,tuntikirjaukset.lopetus - tuntikirjaukset.aloitus AS Kesto,tuntikirjaukset.selite,tuntikirjaukset.saa_tieto FROM tuntikirjaukset, projektit,kayttajat WHERE tuntikirjaukset.projektit_id=projektit.id AND tuntikirjaukset.kayttajat_id=kayttajat.id;'
     cursor.execute(SQL)
     colnames= [desc[0] for desc in cursor.description]
     #print(colnames)
@@ -68,13 +68,35 @@ def tuntikirjaukset_nimilla(cursor):
     #print(palautus)
     return(palautus)
 
+def tuntikirjaukset_table(cursor):
+    palautus="<table> <tr>"
+    SQL = 'SELECT kayttajat.name AS Käyttäjä,projektit.name AS Projekti,tuntikirjaukset.aloitus,tuntikirjaukset.lopetus - tuntikirjaukset.aloitus AS Kesto,tuntikirjaukset.selite,tuntikirjaukset.saa_tieto FROM tuntikirjaukset, projektit,kayttajat WHERE tuntikirjaukset.projektit_id=projektit.id AND tuntikirjaukset.kayttajat_id=kayttajat.id;'
+    cursor.execute(SQL)
+    #colnames= [desc[0] for desc in cursor.description]
+    #print(colnames)
+    for desc in cursor.description:
+        #print(desc[0])
+        palautus=palautus+ "<td>" +str(desc[0])+"</td>"
+    #palautus=palautus+str(colnames) +"<br>"
+    palautus=palautus+"</tr>"
+    row =cursor.fetchone()
+    palautus=palautus+f'<tr><td>{row[0]} <td>{row[1]}</td> <td>{row[2]}</td> <td>{row[3]}</td> <td>{row[4]} </td><td>{row[5]}</td></tr>'
+    
+    while row is not None:
+        #print(row)
+        palautus=palautus+f'<tr><td>{row[0]} <td>{row[1]}</td> <td>{row[2]}</td> <td>{row[3]}</td> <td>{row[4]} </td><td>{row[5]}</td></tr>'
+        row = cursor.fetchone()
+    palautus=palautus+"</table>"
+    return(palautus)
+
 #Funktio luo ja palauttaa emailin body osuuden hakien sisällön funktioiden avulla
 def luo_email(cursor):
-    otsikko1="Tunteja yhteensä: <br>"
+    style="<style> table, th, td {border:1px solid black;}</style>"
+    otsikko1="<h3>Tunteja yhteensä:</h3> <br>"
     data1=select_tuntisumma(cursor)
-    otsikko2="<br> Kaikki tuntikirjaukset: <br>"
-    data2=tuntikirjaukset_nimilla(cursor)
-    palautus=(f'{otsikko1}{data1}{otsikko2}{data2}')
+    otsikko2="<br><h3> Kaikki tuntikirjaukset: </h3><br>"
+    data2=tuntikirjaukset_table(cursor)
+    palautus=(f'{style}{otsikko1}{data1}{otsikko2}{data2}')
     return(palautus)
 
 #Funktio lähettää emailin emailcredentials tiedostossa määritellystä ositteesta samassa tiedostossa määriteltyyn osoitteeseen
