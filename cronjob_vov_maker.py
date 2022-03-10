@@ -1,6 +1,6 @@
 from crontab import CronTab
 
-cron = CronTab(user='admin12345')
+cron = CronTab(user='olli')
 
 job = cron.new(command='python3 vov_backend.py')
 
