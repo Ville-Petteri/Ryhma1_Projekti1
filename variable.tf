@@ -16,5 +16,5 @@ variable "team" {
   default     = "VOVteam"
 }
 variable "prefix" {
-  default = "vov"
+  default = "ollitesti"
 }

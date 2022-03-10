@@ -1,3 +1,4 @@
+from ast import While
 import psycopg2
 from config import config
 import datetime
@@ -210,36 +211,44 @@ def insert_tuntikirjaus(cur):
     print("Tuntikirjaus")
     
     while True:
-        try:
-            print("Syötä aloituspvm muodossa DD-MM-YYYY")
-            aloituspvm = input("aloituspvm: ")
-            
-            print("Syötä aloitusaika muodossa HH:MM")
-            aloitusaika = input("aloitusaika: ")
+        while True:
+            try:
+                print("Syötä aloituspvm muodossa DD-MM-YYYY")
+                aloituspvm = input("aloituspvm: ")
+                
+                print("Syötä aloitusaika muodossa HH-MM")
+                aloitusaika = input("aloitusaika: ")
 
-            aloituspvmaika = muodosta_date_pvm(aloituspvm+" "+aloitusaika)
+                aloituspvmaika = muodosta_date_pvm(aloituspvm+" "+aloitusaika)
+                break
+            except:
+                print("------------------------------")
+                print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
+                print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH-MM")
+                print("------------------------------\n")
+
+        while True:
+            try:
+                print("Syötä lopetuspvm muodossa DD-MM-YYYY")
+                lopetuspvm = input("lopetuspvm: ")
+                
+                print("Syötä lopetusaika muodossa HH-MM")
+                lopetusaika = input("lopetusaika: ")
+
+                lopetuspvmaika = muodosta_date_pvm(lopetuspvm+" "+lopetusaika)
+                break
+            except:
+                print("------------------------------")
+                print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
+                print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH-MM")
+                print("------------------------------\n")
+        if aloituspvmaika < lopetuspvmaika:
             break
-        except:
+        else:
             print("------------------------------")
             print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
-            print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH:MM")
-            print("------------------------------\n")
-
-    while True:
-        try:
-            print("Syötä lopetuspvm muodossa DD-MM-YYYY")
-            lopetuspvm = input("lopetuspvm: ")
-            
-            print("Syötä lopetusaika muodossa HH:MM")
-            lopetusaika = input("lopetusaika: ")
-
-            lopetuspvmaika = muodosta_date_pvm(lopetuspvm+" "+lopetusaika)
-            break
-        except:
-            print("------------------------------")
-            print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
-            print("Tarkista, että syötit pvm muodossa DD-MM-YYYY ja ajan muodossa HH:MM")
-            print("------------------------------\n")    
+            print("Lopetusaika oli ennen aloitusaikaa")
+            input("------------------------------\n")
 
     while True:
         print("Syötä projektinumero")
@@ -277,7 +286,7 @@ def insert_tuntikirjaus(cur):
 
 #pvm funktio
 def muodosta_date_pvm(pvmaika):
-    date_muotoiltu_pvm = datetime.datetime.strptime(pvmaika,"%d-%m-%Y %H:%M")
+    date_muotoiltu_pvm = datetime.datetime.strptime(pvmaika,"%d-%m-%Y %H-%M")
     return date_muotoiltu_pvm
 
 if __name__ == '__main__':
