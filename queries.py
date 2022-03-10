@@ -247,7 +247,7 @@ def insert_tuntikirjaus(cur):
         else:
             print("------------------------------")
             print("\n VIRHE!!! VIRHE!!! VIRHE!!!\n")
-            print("Et voi syöttää lopetus aikaa, joka on aloituksen jälkeen")
+            print("Lopetusaika oli ennen aloitusaikaa")
             input("------------------------------\n")
 
     while True:

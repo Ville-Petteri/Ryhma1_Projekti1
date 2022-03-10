@@ -218,7 +218,7 @@ resource "azurerm_virtual_machine_scale_set" "rg" {
   upgrade_policy_mode = "Manual"
 
   sku {
-    name     = "Standard_F2"
+    name     = "Standard_DS1_v2"
     tier     = "Standard"
     capacity = 2
   }
@@ -256,7 +256,7 @@ resource "azurerm_virtual_machine_scale_set" "rg" {
   storage_profile_image_reference {
     publisher = "Canonical"
     offer     = "UbuntuServer"
-    sku       = "16.04-LTS"
+    sku       = "18.04-LTS"
     version   = "latest"
   }
 }
